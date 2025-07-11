@@ -167,7 +167,7 @@ The project uses Go modules for dependency management. The main dependency is:
 Add the parser to your Go project:
 
 ```bash
-go get github.com/potterbl/statement_parser
+go get github.com/potterbl/statement_parser@latest
 ```
 
 Then import in your Go code:
@@ -179,6 +179,96 @@ import (
 )
 ```
 
+## Installation
+
+### Option 1: Using go install
+```bash
+go install github.com/potterbl/statement_parser@latest
+```
+
+### Option 2: Using docker
+```bash
+docker pull potterbl/statement_parser:latest
+```
+
+### Option 3: Clone and build from source
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/potterbl/statement_parser.git
+   cd statement_parser
+   ```
+
+2. **Install dependencies** (Go modules will handle this automatically):
+   ```bash
+   go mod tidy
+   ```
+
+3. **Build the application**:
+   ```bash
+   go build -o statement_parser .
+   ```
+
+   Or install to your `$GOPATH/bin`:
+   ```bash
+   go install .
+   ```
+
+4. **Create a release** (for maintainers):
+   ```bash
+   # Use the provided Makefile to create a new release
+   make release
+   ```
+
+### Verify Installation
+
+Test that all dependencies are working:
+
+```bash
+# Check if the binary was installed correctly (if using go install)
+statement_parser --version
+
+# Or if built locally
+./statement_parser --version
+```
+
+### Troubleshooting Installation
+
+If you encounter module path issues like:
+```
+module declares its path as: bank_parser
+but was required as: github.com/potterbl/statement_parser
+```
+
+**Solution:**
+
+1. **Clear module cache**:
+   ```bash
+   go clean -modcache
+   ```
+
+2. **Force update to latest version**:
+   ```bash
+   go get -u github.com/potterbl/statement_parser@latest
+   ```
+
+3. **Check available versions**:
+   ```bash
+   go list -m -versions github.com/potterbl/statement_parser
+   ```
+
+4. **If you're getting old version (v0.0.0), try**:
+   ```bash
+   # Clear proxy cache
+   GOPROXY=direct go get github.com/potterbl/statement_parser@latest
+   ```
+
+5. **For version-specific installation**:
+   ```bash
+   # Install specific version (replace v0.0.2 with desired version)
+   go get github.com/potterbl/statement_parser@v0.0.2
+   ```
+
 ## Usage
 
 ### Basic Usage
@@ -187,8 +277,10 @@ import (
 package main
 
 import (
+    "log"
+    "fmt"
     "github.com/potterbl/statement_parser/pkg/types"
-    "github.com/potterbl/statement_parser/pkg/utils"
+    "github.com/potterbl/statement_parser/pkg/utils/statement_parser"
 )
 
 func main() {
@@ -200,11 +292,21 @@ func main() {
     if err != nil {
         log.Fatal(err)
     }
-    
+
     // Process transactions
     for _, transaction := range transactions {
-        fmt.Printf("Date: %s, Amount: %.2f %s, Description: %s\n", 
+        fmt.Printf("Date: %s, Amount: %.2f %s, Description: %s\n",
             transaction.Date, transaction.Amount, transaction.Currency, transaction.Name)
+    }
+}
+
+// NewStatementParser creates a new parser based on bank name
+func NewStatementParser(bankName types.BankName) types.BankParser {
+    switch bankName {
+    case types.BankNameMono:
+        return &statement_parser.MonoBankParser{}
+    default:
+        return nil
     }
 }
 ```
@@ -235,10 +337,11 @@ type BankParser interface {
 ## Project Structure
 
 ```
-bank_parser/
+statement_parser/
 ├── main.go                           # Main application entry point
 ├── go.mod                           # Go module definition
 ├── go.sum                           # Go module checksums
+├── MAKEFILE                         # Build and release automation
 ├── readme.md                        # This file
 └── pkg/
     ├── types/
