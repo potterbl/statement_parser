@@ -1,4 +1,4 @@
-module bank_parser
+module github.com/potterbl/statement_parser
 
 go 1.24.2
 

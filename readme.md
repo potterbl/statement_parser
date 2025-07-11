@@ -167,15 +167,15 @@ The project uses Go modules for dependency management. The main dependency is:
 Add the parser to your Go project:
 
 ```bash
-go get github.com/your-username/bank_parser
+go get github.com/potterbl/statement_parser
 ```
 
 Then import in your Go code:
 
 ```go
 import (
-    "github.com/your-username/bank_parser/pkg/types"
-    "github.com/your-username/bank_parser/pkg/utils"
+    "github.com/potterbl/statement_parser/pkg/types"
+    "github.com/potterbl/statement_parser/pkg/utils"
 )
 ```
 
@@ -187,8 +187,8 @@ import (
 package main
 
 import (
-    "github.com/your-username/bank_parser/pkg/types"
-    "github.com/your-username/bank_parser/pkg/utils"
+    "github.com/potterbl/statement_parser/pkg/types"
+    "github.com/potterbl/statement_parser/pkg/utils"
 )
 
 func main() {

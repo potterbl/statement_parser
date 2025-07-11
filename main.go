@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bank_parser/pkg/types"
-	"bank_parser/pkg/utils/statement_parser"
+	"github.com/potterbl/statement_parser/pkg/types"
+	"github.com/potterbl/statement_parser/pkg/utils/statement_parser"
 )
 
 func NewStatementParser(bankName types.BankName) types.BankParser {

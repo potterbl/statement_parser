@@ -1,14 +1,15 @@
 package statement_parser
 
 import (
-	"bank_parser/pkg/types"
-	"bank_parser/pkg/utils"
 	"fmt"
 	"math"
 	"mime/multipart"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/potterbl/statement_parser/pkg/types"
+	"github.com/potterbl/statement_parser/pkg/utils"
 )
 
 type MonoBankParser struct{}
