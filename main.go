@@ -1,4 +1,4 @@
-package main
+package statement_parser
 
 import (
 	"github.com/potterbl/statement_parser/pkg/types"
