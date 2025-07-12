@@ -39,13 +39,8 @@ func ParsePDFFileWithOCR(file *multipart.FileHeader, languages []string) ([]stri
 		return []string{}, fmt.Errorf("failed to convert PDF to image: %w", err)
 	}
 
-	client := gosseract.NewClient()
-	defer client.Close()
-
-	client.SetLanguage(languages...)
-
 	var (
-		chunks    = make([]string, len(imagePaths))
+		chunks    = []string{}
 		allErrors []error
 		wg        sync.WaitGroup
 		mu        sync.Mutex
@@ -56,6 +51,11 @@ func ParsePDFFileWithOCR(file *multipart.FileHeader, languages []string) ([]stri
 		go func() {
 			defer os.Remove(imagePath)
 			defer wg.Done()
+
+			client := gosseract.NewClient()
+			defer client.Close()
+
+			client.SetLanguage(languages...)
 
 			client.SetImage(imagePath)
 			t, err := client.Text()
