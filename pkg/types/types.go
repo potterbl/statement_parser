@@ -8,11 +8,13 @@ type BankParser interface {
 }
 
 type Transaction struct {
-	Type     string  `json:"type"`
-	Amount   float64 `json:"amount"`
-	Currency string  `json:"currency"`
-	Name     string  `json:"name"`
-	Date     string  `json:"date"`
+	Type         string  `json:"type"`
+	Amount       float64 `json:"amount"`
+	Multiplier   float64 `json:"multiplier"`
+	Currency     string  `json:"currency"`
+	Name         string  `json:"name"`
+	Date         string  `json:"date"`
+	ErrorComment string  `json:"error_comment"`
 }
 
 type BankName string

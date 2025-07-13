@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -56,6 +57,8 @@ func ParsePDFFileWithOCR(file *multipart.FileHeader, languages []string) ([]stri
 			defer client.Close()
 
 			client.SetLanguage(languages...)
+			client.SetVariable("user_defined_dpi", "300")
+			client.SetVariable("tessedit_char_whitelist", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя .,-‑–:+()*/")
 
 			client.SetImage(imagePath)
 			t, err := client.Text()
@@ -81,7 +84,7 @@ func ParsePDFFileWithOCR(file *multipart.FileHeader, languages []string) ([]stri
 }
 
 func ConvertPDFToImage(pdfPath string, outputPrefix string) ([]string, error) {
-	cmd := exec.Command("pdftoppm", "-png", pdfPath, outputPrefix)
+	cmd := exec.Command("pdftoppm", "-png", "-r", "300", pdfPath, outputPrefix)
 	err := cmd.Run()
 	if err != nil {
 		return []string{}, fmt.Errorf("error converting PDF to image: %w", err)
@@ -93,4 +96,14 @@ func ConvertPDFToImage(pdfPath string, outputPrefix string) ([]string, error) {
 	}
 
 	return files, nil
+}
+
+func CleanOCRText(text string) string {
+	re := regexp.MustCompile(`(\d)\s+(\d{3})([.,]\d{2})`)
+	text = re.ReplaceAllString(text, "$1$2$3")
+	text = strings.ReplaceAll(text, "\u00A0", "")
+	text = strings.ReplaceAll(text, "\u202F", "")
+	text = strings.ReplaceAll(text, "ЧАН", "UAH")
+	text = regexp.MustCompile(`\s{2,}`).ReplaceAllString(text, " ")
+	return text
 }
