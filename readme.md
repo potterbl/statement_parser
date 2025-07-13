@@ -1,8 +1,23 @@
 # Bank Statement Parser for Ukrainian Banks
 
-A Go-based tool for parsing bank statements from Ukrainian banks using OCR (Optical Character Recognition) technology. The parser extracts transaction data from PDF bank statements and converts them into structured JSON format.
+A powerful Go-based tool for parsing bank statements from Ukrainian banks using advanced OCR (Optical Character Recognition) technology. This parser extracts transaction data from PDF bank statements and converts them into a structured JSON format, making financial data analysis seamless and efficient.
 
-## Features
+## 📜 Table of Contents
+
+- [Features](#-features)
+- [Supported Banks](#-supported-banks)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Usage Examples](#-usage-examples)
+- [API Reference](#-api-reference)
+- [Project Structure](#-project-structure)
+- [Contributing](#contributing)
+- [License](#-license)
+- [Contact](#-contact)
+- [Acknowledgments](#-acknowledgments)
+
+
+## 🌟 Features
 
 - **PDF to Text Conversion**: Converts PDF bank statements to text using OCR
 - **Multi-language Support**: Supports multiple languages for OCR processing
@@ -10,9 +25,11 @@ A Go-based tool for parsing bank statements from Ukrainian banks using OCR (Opti
 - **Concurrent Processing**: Efficient processing of multi-page PDF documents
 - **Structured Output**: Returns transaction data in a standardized JSON format
 
-## Supported Banks
+## 🏦 Supported Banks
 
-- **Monobank** - Full support for statement parsing
+- **Monobank** - Full statement parsing support
+- **Privat24** - Full statement parsing support
+- *More banks coming soon!*
 
 ## Prerequisites
 
@@ -162,7 +179,7 @@ The project uses Go modules for dependency management. The main dependency is:
 
 ## Installation
 
-### Use as a library in your project
+### As a Go Library
 
 Add the parser to your Go project:
 
@@ -174,104 +191,13 @@ Then import in your Go code:
 
 ```go
 import (
-    "github.com/potterbl/statement_parser/pkg/types"
-    "github.com/potterbl/statement_parser/pkg/utils"
+    "github.com/potterbl/statement_parser"
 )
 ```
 
-## Installation
+## 📖 Usage Examples
 
-### Option 1: Using go install
-```bash
-go install github.com/potterbl/statement_parser@latest
-```
-
-### Option 2: Using docker
-```bash
-docker pull potterbl/statement_parser:latest
-```
-
-### Option 3: Clone and build from source
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/potterbl/statement_parser.git
-   cd statement_parser
-   ```
-
-2. **Install dependencies** (Go modules will handle this automatically):
-   ```bash
-   go mod tidy
-   ```
-
-3. **Build the application**:
-   ```bash
-   go build -o statement_parser .
-   ```
-
-   Or install to your `$GOPATH/bin`:
-   ```bash
-   go install .
-   ```
-
-4. **Create a release** (for maintainers):
-   ```bash
-   # Use the provided Makefile to create a new release
-   make release
-   ```
-
-### Verify Installation
-
-Test that all dependencies are working:
-
-```bash
-# Check if the binary was installed correctly (if using go install)
-statement_parser --version
-
-# Or if built locally
-./statement_parser --version
-```
-
-### Troubleshooting Installation
-
-If you encounter module path issues like:
-```
-module declares its path as: bank_parser
-but was required as: github.com/potterbl/statement_parser
-```
-
-**Solution:**
-
-1. **Clear module cache**:
-   ```bash
-   go clean -modcache
-   ```
-
-2. **Force update to latest version**:
-   ```bash
-   go get -u github.com/potterbl/statement_parser@latest
-   ```
-
-3. **Check available versions**:
-   ```bash
-   go list -m -versions github.com/potterbl/statement_parser
-   ```
-
-4. **If you're getting old version (v0.0.0), try**:
-   ```bash
-   # Clear proxy cache
-   GOPROXY=direct go get github.com/potterbl/statement_parser@latest
-   ```
-
-5. **For version-specific installation**:
-   ```bash
-   # Install specific version (replace v0.0.2 with desired version)
-   go get github.com/potterbl/statement_parser@v0.0.2
-   ```
-
-## Usage
-
-### Basic Usage
+### Basic PDF Parsing
 
 ```go
 package main
@@ -279,41 +205,31 @@ package main
 import (
     "log"
     "fmt"
+    "github.com/potterbl/statement_parser"
     "github.com/potterbl/statement_parser/pkg/types"
-    "github.com/potterbl/statement_parser/pkg/utils/statement_parser"
 )
 
 func main() {
-    // Create a parser for Monobank
-    parser := NewStatementParser(types.BankNameMono)
+    // Create a Monobank parser
+    parser := statement_parser.NewStatementParser(types.BankNameMono)
 
-    // Parse PDF file with Ukrainian and English language support
+    // Parse PDF with Ukrainian and English language support
     transactions, err := parser.ParsePDF(fileHeader, []string{"ukr", "eng"})
     if err != nil {
         log.Fatal(err)
     }
 
-    // Process transactions
+    // Process and display transactions
     for _, transaction := range transactions {
         fmt.Printf("Date: %s, Amount: %.2f %s, Description: %s\n",
             transaction.Date, transaction.Amount, transaction.Currency, transaction.Name)
     }
 }
-
-// NewStatementParser creates a new parser based on bank name
-func NewStatementParser(bankName types.BankName) types.BankParser {
-    switch bankName {
-    case types.BankNameMono:
-        return &statement_parser.MonoBankParser{}
-    default:
-        return nil
-    }
-}
 ```
 
-### API Structure
+## 🔍 API Reference
 
-#### Transaction Structure
+### Transaction Structure
 
 ```go
 type Transaction struct {
@@ -325,7 +241,7 @@ type Transaction struct {
 }
 ```
 
-#### Bank Parser Interface
+### Bank Parser Interface
 
 ```go
 type BankParser interface {
@@ -334,22 +250,21 @@ type BankParser interface {
 }
 ```
 
-## Project Structure
+## 🗂 Project Structure
 
 ```
 statement_parser/
-├── main.go                           # Main application entry point
-├── go.mod                           # Go module definition
-├── go.sum                           # Go module checksums
-├── MAKEFILE                         # Build and release automation
-├── readme.md                        # This file
-└── pkg/
-    ├── types/
-    │   └── types.go                 # Type definitions and interfaces
-    └── utils/
-        ├── utils.go                 # PDF processing and OCR utilities
-        └── statement_parser/
-            └── mono_parser.go       # Monobank-specific parser implementation
+├── LICENSE            # Project License
+├── Makefile           # Makefile for easy project management
+├── changelog.md       # Project changelog
+├── go.mod             # Go module definition
+├── go.sum             # Go module checksums
+├── main.go            # Main application entrypoint
+├── pkg/               # Core library packages
+│   ├── consts/        # Constants and configuration
+│   ├── types/         # Type definitions
+│   └── utils/         # Utility functions
+└── readme.md          # Project documentation
 ```
 
 ## How It Works
@@ -420,21 +335,22 @@ The parser includes comprehensive error handling for:
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/new-bank-support`)
-3. Commit your changes (`git commit -am 'Add support for XYZ Bank'`)
-4. Push to the branch (`git push origin feature/new-bank-support`)
-5. Create a Pull Request
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## Support
+## 📄 License
 
-For issues and questions:
-- Create an issue in the repository
-- [telegram](https://t.me/potter_bl)
+Distributed under the MIT License. See `LICENSE` for more information.
 
-## Changelog
+## 📧 Contact
 
-### v1.0.0
-- Initial release with Monobank support
-- PDF to text conversion using OCR
-- Multi-language support
-- Concurrent processing capabilities
+Project Maintainer: potterbl
+Project Link: https://github.com/potterbl/statement_parser
+
+## 🙏 Acknowledgments
+
+- [Tesseract OCR](https://github.com/tesseract-ocr/tesseract)
+- [Poppler](https://poppler.freedesktop.org/)
+- Go Community
