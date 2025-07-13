@@ -7,8 +7,11 @@ changelog:
 	@git log $(VERSION)..HEAD --pretty=format:"* %s" --no-merges >> changelog.md
 	@echo "" >> changelog.md
 
-release:
+release: changelog
 	@echo "Current version: $(VERSION)"
 	@echo "Releasing version: $(NEXT_PATCH)"
+	git add changelog.md
+	git commit -m "Update changelog for $(NEXT_PATCH)"
 	git tag $(NEXT_PATCH)
 	git push origin $(NEXT_PATCH)
+	git push origin HEAD
