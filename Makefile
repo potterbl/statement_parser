@@ -1,11 +1,12 @@
 VERSION ?= $(shell git describe --tags --abbrev=0 2>/dev/null || echo v0.0.0)
-
 NEXT_PATCH := $(shell echo $(VERSION) | awk -F. '{printf "v%d.%d.%d", $$1, $$2, $$3+1}')
 
 changelog:
-	@echo "## $(NEXT_PATCH)" > changelog.md
-	@git log $(VERSION)..HEAD --pretty=format:"* %s" --no-merges >> changelog.md
-	@echo "" >> changelog.md
+	@echo "## $(NEXT_PATCH)" > .changelog.tmp
+	@git log $(VERSION)..HEAD --pretty=format:"* %s" --no-merges >> .changelog.tmp
+	@echo "" >> .changelog.tmp
+	@cat changelog.md >> .changelog.tmp 2>/dev/null || true
+	@mv .changelog.tmp changelog.md
 
 release: changelog
 	@echo "Current version: $(VERSION)"
