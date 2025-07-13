@@ -1,2 +1,2 @@
-## v0.0.7
-* add changelog
+## v0.0.8
+* upd makefile to push changelog on release
