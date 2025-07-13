@@ -20,5 +20,6 @@ type Transaction struct {
 type BankName string
 
 const (
-	BankNameMono BankName = "Mono"
+	BankNameMono   BankName = "Mono"
+	BankNamePrivat BankName = "Privat24"
 )

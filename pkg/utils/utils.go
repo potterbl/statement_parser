@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/csv"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -11,8 +12,84 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/otiai10/gosseract"
+	"github.com/otiai10/gosseract/v2"
 )
+
+func ParseCSVToStringArray(csvData []byte) ([][]string, error) {
+	reader := csv.NewReader(strings.NewReader(string(csvData)))
+	reader.Comma = ','
+	reader.LazyQuotes = true
+	reader.TrimLeadingSpace = true
+
+	var result [][]string
+	for {
+		record, err := reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, fmt.Errorf("error reading CSV: %v", err)
+		}
+		result = append(result, record)
+	}
+
+	return result, nil
+}
+
+func ExtractSheetsWithCamelot(file *multipart.FileHeader) ([][]byte, error) {
+	tmpPDF, err := os.CreateTemp("", "*.pdf")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(tmpPDF.Name())
+	defer tmpPDF.Close()
+
+	fileOpened, err := file.Open()
+	if err != nil {
+		return nil, err
+	}
+	defer fileOpened.Close()
+
+	if _, err := io.Copy(tmpPDF, fileOpened); err != nil {
+		return nil, err
+	}
+	tmpPDF.Close()
+
+	tmpDir, err := os.MkdirTemp("", "camelot_csv")
+	if err != nil {
+		return nil, err
+	}
+	defer os.RemoveAll(tmpDir)
+
+	cmd := exec.Command("python3", "-m", "camelot",
+		"-p", "all",
+		"-o", filepath.Join(tmpDir, "output.csv"),
+		"-f", "csv",
+		"stream",
+		tmpPDF.Name(),
+	)
+
+	_, err = cmd.CombinedOutput()
+	if err != nil {
+		return nil, err
+	}
+
+	files, err := filepath.Glob(filepath.Join(tmpDir, "output-page-*.csv"))
+	if err != nil {
+		return nil, err
+	}
+
+	var result [][]byte
+	for _, f := range files {
+		data, err := os.ReadFile(f)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, data)
+	}
+
+	return result, nil
+}
 
 func ParsePDFFileWithOCR(file *multipart.FileHeader, languages []string) ([]string, error) {
 	tmpFile, err := os.CreateTemp("", "*.pdf")
